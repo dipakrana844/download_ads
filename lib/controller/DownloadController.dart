@@ -35,11 +35,11 @@ class DownloadController extends GetxController {
 
     // Build the url
     var linkParts = link.replaceAll(" ", "").split("/");
-    // var url =
-    //     '${linkParts[0]}//${linkParts[2]}/${linkParts[3]}/${linkParts[4]}' +
-    //         "?__a=1&__d=dis";
     var url =
-        '${linkParts[0]}//${linkParts[2]}/${linkParts[3]}/${linkParts[4]}';
+        '${linkParts[0]}//${linkParts[2]}/${linkParts[3]}/${linkParts[4]}' +
+            "?__a=1&__d=dis";
+    // var url =
+    //     '${linkParts[0]}//${linkParts[2]}/${linkParts[3]}/${linkParts[4]}';
     print("My url is : $url");
 
     // Make Http requiest to get the download link of video
@@ -51,6 +51,15 @@ class DownloadController extends GetxController {
         request.cookies.add(Cookie(element.name, element.value));
       });
       var response = await request.close();
+      print("My Status Code : ${response.statusCode}");
+      if(response.statusCode == HttpStatus.unauthorized){
+        // private account's video
+        await Navigator.push(
+            context, MaterialPageRoute(builder: (_) => InstaLogin()));
+      }
+      if(response.statusCode == HttpStatus.notFound){
+        print("Data not found");
+      }
       if (response.statusCode == HttpStatus.OK) {
         var json = await response.transform(utf8.decoder).join();
         var data = jsonDecode(json);
